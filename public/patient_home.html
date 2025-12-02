@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<header>
+    <h1>Hospital Triage – Patient</h1>
+    <p class="subtitle">Welcome to the triage portal</p>
+</header>
+
+<!-- Use patient-main to control layout specifically for the home screen -->
+<main class="patient-main">
+    <div class="card">
+
+        <!-- 1. Hero image -->
+        <div class="hero-block">
+            <img src="../images/triage.png" alt="Triage promo" class="hero-image">
+        </div>
+
+        <!-- 2. Wait-time section: label + number centered as a block -->
+        <div class="wait-time-section">
+            <p class="muted-text">Your estimated wait time now</p>
+            <div id="waitTimeNumber" class="wait-time-number">Loading...</div>
+        </div>
+
+        <div class="section">
+            <a class="btn btn-primary btn-block"
+               href="patient_register.html"
+               id="joinButton"
+               onclick="markJoining()">
+                Join the Wait List
+            </a>
+        </div>
+
+    </div>
+</main>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <a class="nav-link active" href="patient_home.html">
+        <div class="nav-icon"></div>
+        Home
+    </a>
+    <a class="nav-link" href="patient_info.html" id="myInfoNav">
+        <div class="nav-icon"></div>
+        My Info
+    </a>
+    <a class="nav-link" href="patient_status.html" id="myStatusNav">
+        <div class="nav-icon"></div>
+        My Status
+    </a>
+</div>
+
+<!-- Page script: wait-time logic + "must join wait list before accessing" guards -->
+<script>
+    const REG_KEY = "triageHasRegistered";
+
+    function hasRegistered() {
+        return localStorage.getItem(REG_KEY) === "true";
+    }
+
+    // Mark as "joined wait list".
+    // (We actually set REG_KEY for real on successful register, but this is OK UX-wise.)
+    function markJoining() {
+        localStorage.setItem(REG_KEY, "true");
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        const waitEl = document.getElementById("waitTimeNumber");
+
+        // 1. Load real queue from backend and show max estimated wait time
+        try {
+            const res = await fetch("/api/patients");
+            if (!res.ok) {
+                waitEl.textContent = "N/A";
+            } else {
+                const queue = await res.json();
+
+                if (!queue.length) {
+    // No one is waiting -> if you join now, you are seen right away
+    waitEl.textContent = "0 mins";
+     } else {
+    const AVG_SERVICE_MIN = 20; // must match server's AVG_SERVICE_MIN
+    const peopleAhead = queue.length;
+    const estimatedForNew = peopleAhead * AVG_SERVICE_MIN;
+
+    waitEl.textContent = `${estimatedForNew} mins`;
+}
+
+            }
+        } catch (e) {
+            console.error(e);
+            waitEl.textContent = "N/A";
+        }
+
+        // 2. Before joining the wait list, "My Info" and "My Status" should not be accessible.
+        const myInfoLink = document.getElementById("myInfoNav");
+        const myStatusLink = document.getElementById("myStatusNav");
+
+        function guardClick(e) {
+            if (!hasRegistered()) {
+                e.preventDefault();
+                alert("Please join the wait list first.");
+            }
+        }
+
+        if (myInfoLink) {
+            myInfoLink.addEventListener("click", guardClick);
+        }
+        if (myStatusLink) {
+            myStatusLink.addEventListener("click", guardClick);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Info (Admin)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Patient Info</h1>
+</header>
+
+<main>
+    <div class="card">
+
+        <div class="status-block">
+            <div class="status-row">
+                <strong>ID:</strong> <span id="pId"></span>
+            </div>
+            <div class="status-row">
+                <strong>Name:</strong> <span id="pName"></span>
+            </div>
+            <div class="status-row">
+                <strong>Age:</strong> <span id="pAge"></span>
+            </div>
+            <div class="status-row">
+                <strong>Triage Level:</strong>
+                <span id="pLevel" class="tag"></span>
+            </div>
+            <div class="status-row">
+                <strong>Symptoms:</strong> <span id="pSymptoms"></span>
+            </div>
+            <div class="status-row">
+                <strong>Pain Level:</strong> <span id="pPain"></span>
+            </div>
+            <div class="status-row">
+                <strong>Notes:</strong> <span id="pNotes"></span>
+            </div>
+        </div>
+
+        <a id="backLink" href="admin_update_priority.html" class="btn btn-blue btn-block">
+            Back
+        </a>
+
+    </div>
+</main>
+
+<script>
+    // Helper to read ?id= from the URL
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    async function loadPatient() {
+        const id = getQueryParam("id");
+
+        if (!id) {
+            alert("No patient ID provided.");
+            window.location.href = "admin_home.html";
+            return;
+        }
+
+        // Set back link so you return to the same patient in Update Priority
+        const backLink = document.getElementById("backLink");
+        backLink.href = "admin_update_priority.html?id=" + encodeURIComponent(id);
+
+        try {
+            const res = await fetch(`/api/patients/${encodeURIComponent(id)}`);
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert("Error loading patient: " + (err.error || res.statusText));
+                window.location.href = "admin_home.html";
+                return;
+            }
+
+            const p = await res.json();
+
+            document.getElementById("pId").textContent        = p.id;
+            document.getElementById("pName").textContent      = p.name;
+            document.getElementById("pAge").textContent       = p.age ?? "";
+            document.getElementById("pSymptoms").textContent  = p.symptoms || "";
+            document.getElementById("pPain").textContent      = p.pain_level ?? "";
+            document.getElementById("pNotes").textContent     = p.notes || "";
+
+            const levelEl = document.getElementById("pLevel");
+            levelEl.textContent = `Level ${p.triage_level_code}`;
+            levelEl.className   = `tag tag-level-${p.triage_level_code}`;
+        } catch (e) {
+            console.error(e);
+            alert("Network error loading patient info.");
+            window.location.href = "admin_home.html";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadPatient);
+</script>
+
+</body>
+</html>

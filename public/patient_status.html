@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submission Status</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Submission Status</h1>
+</header>
+
+<main>
+  <div class="card">
+
+    <!-- Enter ID / code -->
+    <div class="form-group">
+      <label for="statusIdInput">Enter your patient ID</label>
+      <input id="statusIdInput"
+             type="text"
+             placeholder="e.g., 3 or ABC">
+    </div>
+
+    <div class="section">
+      <button type="button"
+              class="btn btn-primary btn-block"
+              onclick="checkStatus()">
+        Check Status
+      </button>
+    </div>
+
+    <!-- Status information section -->
+    <div class="status-block" id="statusBlock" style="margin-top:16px; display:none;">
+
+      <div class="status-row">
+        <span class="status-label">ID:</span>
+        <span id="statusId"></span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">Name:</span>
+        <span id="statusName"></span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">Age:</span>
+        <span id="statusAge"></span>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">Triage Level:</span>
+        <span id="statusLevel" class="tag"></span>
+      </div>
+
+      <!-- Highlighted wait time -->
+      <div class="wait-highlight">
+        <p class="wait-highlight-label">Estimated Wait Time</p>
+        <div class="wait-time-large" id="statusWait"></div>
+      </div>
+
+    </div>
+
+    <a class="btn btn-secondary btn-block" href="patient_home.html" style="margin-top:16px;">
+      Back
+    </a>
+
+  </div>
+</main>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <a class="nav-link" href="patient_home.html">
+    <div class="nav-icon"></div>
+    Home
+  </a>
+  <a class="nav-link active" href="patient_info.html" id="myInfoNav">
+    <div class="nav-icon"></div>
+    My Info
+  </a>
+  <a class="nav-link" href="patient_status.html" id="myStatusNav">
+    <div class="nav-icon"></div>
+    My Status
+  </a>
+</div>
+
+<script>
+  const REG_KEY = "triageHasRegistered";
+  const ID_KEY  = "triagePatientId"; // set in patient_register.js after successful POST
+
+  function hasRegistered() {
+    return localStorage.getItem(REG_KEY) === "true";
+  }
+
+  async function checkStatus() {
+    const inputEl = document.getElementById("statusIdInput");
+    const idFromInput = inputEl.value.trim();
+    const idFromStorage = localStorage.getItem(ID_KEY);
+
+    // Priority: whatever user typed; if empty, fall back to stored id
+    const id = idFromInput || idFromStorage;
+
+    if (!id) {
+      alert("Please enter your patient ID (or register first).");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/patients/${encodeURIComponent(id)}/status`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert("Error loading status: " + (err.error || res.statusText));
+        return;
+      }
+
+      const p = await res.json();
+
+      // Show status block
+      const block = document.getElementById("statusBlock");
+      block.style.display = "block";
+
+      document.getElementById("statusId").textContent   = p.id;
+      document.getElementById("statusName").textContent = p.name;
+      document.getElementById("statusAge").textContent  = p.age;
+
+      const levelEl = document.getElementById("statusLevel");
+      levelEl.textContent = `Level ${p.triage_level_code}`;
+      levelEl.className   = `tag tag-level-${p.triage_level_code}`;
+
+      document.getElementById("statusWait").textContent =
+        `${p.estimated_wait_min} mins`;
+
+    } catch (e) {
+      console.error(e);
+      alert("Network error loading status.");
+    }
+  }
+
+  // On load, prefill ID from localStorage if we have one,
+  // and auto-check so the flow after registration still feels smooth.
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedId = localStorage.getItem(ID_KEY);
+    if (savedId) {
+      document.getElementById("statusIdInput").value = savedId;
+      checkStatus();
+    }
+  });
+</script>
+
+</body>
+</html>

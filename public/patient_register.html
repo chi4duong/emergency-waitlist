@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<header>
+    <h1>Patient Register</h1>
+    <p class="subtitle">Submit your information</p>
+</header>
+
+<main>
+    <div class="card">
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regName">Name</label>
+                <input id="regName" type="text" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="regAge">Age</label>
+                <input id="regAge" type="number" placeholder="Age">
+            </div>
+
+            <div class="form-group">
+                <label for="regSymptoms">Symptoms</label>
+                <textarea id="regSymptoms" placeholder="Describe your symptoms"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="regPain">Pain Level (1–10)</label>
+                <input id="regPain" type="number" min="1" max="10" placeholder="5">
+            </div>
+
+            <div class="form-group">
+                <label for="regNotes">Notes (allergies, medications…)</label>
+                <textarea id="regNotes" placeholder="Optional notes"></textarea>
+            </div>
+
+            <button type="button"
+                    class="btn btn-primary btn-block"
+                    onclick="handleRegisterSubmit()">
+                Submit
+            </button>
+        </form>
+
+
+    </div>
+</main>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <a class="nav-link active" href="patient_home.html">
+        <div class="nav-icon"></div>
+        Home
+    </a>
+    <a class="nav-link" href="patient_info.html" id="myInfoNav">
+        <div class="nav-icon"></div>
+        My Info
+    </a>
+    <a class="nav-link" href="patient_status.html" id="myStatusNav">
+        <div class="nav-icon"></div>
+        My Status
+    </a>
+</div>
+
+<script>
+  const REG_KEY = "triageHasRegistered";
+  const ID_KEY  = "triagePatientId";
+
+  function hasRegistered() {
+    return localStorage.getItem(REG_KEY) === "true";
+  }
+
+  // Handle form submission
+  async function handleRegisterSubmit() {
+    const name      = document.getElementById("regName").value.trim();
+    const age       = document.getElementById("regAge").value.trim();
+    const symptoms  = document.getElementById("regSymptoms").value.trim();
+    const painStr   = document.getElementById("regPain").value.trim();
+    const notes     = document.getElementById("regNotes").value.trim();
+
+    if (!name || !age || !symptoms || !painStr) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    const pain = Number(painStr);
+    if (isNaN(pain) || pain < 1 || pain > 10) {
+      alert("Pain level must be a number between 1 and 10.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/patients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          age,
+          symptoms,
+          pain_level: pain,
+          notes
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert("Error submitting registration: " + (err.error || res.statusText));
+        return;
+      }
+
+      const data = await res.json();
+
+      // Remember that this browser has a registered patient
+      localStorage.setItem(REG_KEY, "true");
+      // Save the patient ID so we can auto-fill status later
+      localStorage.setItem(ID_KEY, data.id);
+
+      // Tell the patient their ID clearly
+      alert(
+        `Registration submitted successfully.\n\n` +
+        `Your patient ID is: ${data.id}\n` +
+        `Please keep this ID so you can check your status later.`
+      );
+
+      window.location.href = "patient_status.html";
+    } catch (e) {
+      console.error(e);
+      alert("Network error submitting registration.");
+    }
+  }
+
+  // (you can keep or remove the guard logic here if you had it)
+</script>
+
+
+
+</body>
+</html>

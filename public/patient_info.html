@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Info</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Patient Info</h1>
+</header>
+
+<main>
+    <div class="card">
+
+        <div class="status-block">
+            <div class="status-row">
+                <strong>Name:</strong> <span id="pName"></span>
+            </div>
+            <div class="status-row">
+                <strong>Age:</strong> <span id="pAge"></span>
+            </div>
+            <div class="status-row">
+                <strong>Symptoms:</strong> <span id="pSymptoms"></span>
+            </div>
+            <div class="status-row">
+                <strong>Pain Level:</strong> <span id="pPain"></span>
+            </div>
+            <div class="status-row">
+                <strong>Notes:</strong> <span id="pNotes"></span>
+            </div>
+        </div>
+
+        <a class="btn btn-primary btn-block" href="patient_home.html">
+            Back
+        </a>
+
+    </div>
+</main>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <a class="nav-link active" href="patient_home.html">
+        <div class="nav-icon"></div>
+        Home
+    </a>
+    <a class="nav-link" href="patient_info.html" id="myInfoNav">
+        <div class="nav-icon"></div>
+        My Info
+    </a>
+    <a class="nav-link" href="patient_status.html" id="myStatusNav">
+        <div class="nav-icon"></div>
+        My Status
+    </a>
+</div>
+
+<script>
+    const REG_KEY = "triageHasRegistered";
+
+    function hasRegistered() {
+        return localStorage.getItem(REG_KEY) === "true";
+    }
+
+    async function loadPatientInfo() {
+        const id = localStorage.getItem("triagePatientId");
+
+        if (!id) {
+            alert("No patient information found. Please register first.");
+            window.location.href = "patient_register.html";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/patients/${encodeURIComponent(id)}`);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                alert("Error loading patient info: " + (err.error || res.statusText));
+                window.location.href = "patient_home.html";
+                return;
+            }
+
+            const p = await res.json();
+
+            document.getElementById("pName").textContent = p.name;
+            document.getElementById("pAge").textContent = p.age ?? "";
+            document.getElementById("pSymptoms").textContent = p.symptoms || "";
+            document.getElementById("pPain").textContent = p.pain_level ?? "";
+            document.getElementById("pNotes").textContent = p.notes || "";
+        } catch (e) {
+            console.error(e);
+            alert("Network error loading patient info.");
+            window.location.href = "patient_home.html";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Guard bottom nav (same behavior as other pages)
+        const myInfoLink = document.getElementById("myInfoNav");
+        const myStatusLink = document.getElementById("myStatusNav");
+
+        function guardClick(e) {
+            if (!hasRegistered()) {
+                e.preventDefault();
+                alert("Please join the wait list first.");
+            }
+        }
+
+        if (myInfoLink) myInfoLink.addEventListener("click", guardClick);
+        if (myStatusLink) myStatusLink.addEventListener("click", guardClick);
+
+        // Load actual info
+        loadPatientInfo();
+    });
+</script>
+
+</body>
+</html>

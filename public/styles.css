@@ -1,0 +1,680 @@
+/* =========================================================
+   Global Base Styles
+   ========================================================= */
+
+/* Simple reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Body: secondary font for reading comfort */
+body {
+    font-family: "Times New Roman", "Times", serif;
+    background-color: #f5f5f5;
+    color: #333333;
+    line-height: 1.5;
+}
+
+/* Headings & important UI text: Arial */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+.btn,
+.nav-link,
+.table-title {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Main wrapper for each page (if used) */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   Header / Titles
+   ========================================================= */
+
+header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #dddddd;
+    padding: 16px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #444444;
+}
+
+header p.subtitle {
+    margin-top: 6px;
+    margin-bottom: 0;
+    font-size: 14px;
+    color: #666666;
+}
+
+/* =========================================================
+   Layout & Cards
+   ========================================================= */
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px 80px; /* extra space for bottom nav */
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    max-width: 640px;
+    width: 100%;
+}
+
+/* For admin pages with wider content (e.g., tables) */
+.card-wide {
+    max-width: 960px;
+}
+
+/* Blue button for Back on admin patient info page */
+.btn-blue {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+
+.btn-blue:hover {
+    background-color: #2d6fb8;
+    box-shadow: 0 2px 6px rgba(45, 111, 184, 0.4);
+}
+
+/* Generic section spacing inside cards */
+.section {
+    margin-bottom: 20px;
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   Patient Home – Hero & Wait Time
+   ========================================================= */
+
+/* Patient home specific layout: move the card toward the center
+   and reduce the large empty area at the bottom */
+.patient-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;        /* vertically center the card */
+    padding: 24px 16px 72px;    /* space around card, 72px for bottom-nav */
+}
+
+/* Hero container: width matches card, height adjusts naturally */
+.hero-block {
+    width: 100%;
+    border-radius: 12px;
+    background: #f2f2f2;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+/* Image automatically scales by width, height adjusts proportionally */
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover; /* fill the block horizontally while keeping shape */
+}
+/* Center the whole wait-time section */
+.wait-time-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.wait-time-large {
+    font-size: 36px;
+    font-weight: bold;
+    color: #4a90e2; /* BLUE */
+    text-align: center;
+    margin-top: 8px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.wait-time-large {
+    color: #4a90e2 !important; /* FORCE BLUE */
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 8px;
+}
+/* Centered number for "Estimated wait time" */
+.wait-time-number {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+/* Helper text style */
+.muted-text {
+    font-size: 13px;
+    color: #777777;
+}
+
+/* =========================================================
+   Forms & Inputs
+   ========================================================= */
+
+form {
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #444444;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #dddddd;
+    font-size: 14px;
+    font-family: "Times New Roman", "Times", serif;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+/* Inline fields */
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Small helper / error messages */
+.form-hint {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #888888;
+}
+
+/* =========================================================
+   Search group (input + icon on the right)
+   ========================================================= */
+
+.search-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-group input[type="search"] {
+    flex: 1;
+}
+
+/* Small square search button with icon */
+.search-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid #dddddd;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    padding: 0;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-button:hover {
+    background-color: #e0e0e0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.btn {
+    display: inline-block;
+    border: none;
+    border-radius: 40px; /* Appletree-style rounded */
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Primary patient actions: Appletree-style coral red */
+.btn-primary {
+    background-color: #dd6b5c;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #c85d50;
+    box-shadow: 0 2px 6px rgba(200, 93, 80, 0.4);
+}
+
+.btn-primary:disabled {
+    background-color: #e9b3ac;
+    cursor: default;
+    box-shadow: none;
+}
+
+/* Secondary (outline) */
+.btn-outline {
+    background-color: #ffffff;
+    color: #4a90e2;
+    border: 1px solid #4a90e2;
+}
+
+.btn-outline:hover {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+
+/* Neutral button (e.g., Cancel) */
+.btn-secondary {
+    background-color: #f2f2f2;
+    color: #444444;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Danger (e.g., delete) */
+.btn-danger {
+    background-color: #c0392b;
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background-color: #a93226;
+}
+
+/* Full width button on small screens */
+.btn-block {
+    width: 100%;
+}
+
+/* Button group rows */
+.button-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* =========================================================
+   Original triage pill styles (if needed elsewhere)
+   ========================================================= */
+
+.btn-level-1 {
+    background-color: #efa59b;
+    color: #ffffff;
+}
+
+.btn-level-2 {
+    background-color: #dd6b5c;
+    color: #ffffff;
+}
+
+.btn-level-3 {
+    background-color: #c14a3e;
+    color: #ffffff;
+}
+
+.btn-level-1:hover,
+.btn-level-2:hover,
+.btn-level-3:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ffffff;
+}
+
+.tag-level-1 {
+    background-color: #efa59b;
+}
+
+.tag-level-2 {
+    background-color: #dd6b5c;
+}
+
+.tag-level-3 {
+    background-color: #c14a3e;
+}
+
+/* =========================================================
+   New triage level choice buttons (Update Priority page)
+   ========================================================= */
+
+/* Base style for all level buttons */
+.level-choice {
+    border-radius: 40px;
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    color: #444444;
+}
+
+/* Different shades of grey when idle (not selected) */
+.level-1 {
+    background-color: #f2f2f2;   /* light grey */
+}
+
+.level-2 {
+    background-color: #e3e3e3;   /* medium grey */
+}
+
+.level-3 {
+    background-color: #d4d4d4;   /* darker grey */
+}
+
+/* Hover: turn red while hovering */
+.level-choice:hover {
+    background-color: #dd6b5c;
+    color: #ffffff;
+}
+
+/* Selected state: stays red even after mouse leaves */
+.level-choice.active,
+.level-choice.active:hover {
+    background-color: #dd6b5c;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(200, 93, 80, 0.4);
+}
+
+/* =========================================================
+   Links
+   ========================================================= */
+
+a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Small inline link below forms, etc. */
+.link-inline {
+    font-size: 13px;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+/* =========================================================
+   Patient Bottom Navigation
+   ========================================================= */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: #ffffff;
+    border-top: 1px solid #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 10;
+}
+
+.bottom-nav .nav-link {
+    font-size: 13px;
+    color: #666666;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bottom-nav .nav-link.active {
+    color: #4a90e2;
+    font-weight: bold;
+}
+
+/* Icon placeholder if you later add icons */
+.nav-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #dddddd;
+    margin-bottom: 4px;
+}
+
+/* =========================================================
+   Tables (Admin Patient List)
+   ========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: #ffffff;
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+th,
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+th {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #444444;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Row selected state (if you add a class to highlight selected patient) */
+tr.selected {
+    background-color: #fff5f2;
+}
+
+/* Cell that shows wait time */
+.cell-wait {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+/* Clickable patient ID in admin table */
+.patient-id-link {
+    color: #4A90E2;               /* calming blue */
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.patient-id-link:hover,
+.patient-id-link:focus {
+    text-decoration: underline;
+    color: #2d6fb8;               /* slightly darker on hover */
+}
+
+/* Admin header area on admin pages */
+.admin-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.admin-header-row h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+/* =========================================================
+   Status / Info Blocks
+   ========================================================= */
+
+/* Grey info block; when .empty, only the grey box is visible */
+.status-block {
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+/* Keep a blank grey area before any valid patient is loaded */
+.status-block.empty {
+    min-height: 70px;
+}
+
+/* Hide inner text when empty while keeping the grey box */
+.status-block.empty * {
+    visibility: hidden;
+}
+
+.status-row {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.status-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+/* =========================================================
+   Status Page – Highlighted Wait Time Display
+   ========================================================= */
+
+/* Highlight container to make wait time prominent */
+.wait-highlight {
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Label above the large wait time number */
+.wait-highlight-label {
+    font-size: 13px;
+    color: #777777;
+    margin-bottom: 6px;
+    margin-top: 0;
+}
+
+/* Large, most prominent wait-time number */
+.wait-time-large {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+    color: #dd6b5c;    /* same coral red as main action button */
+}
+
+/* =========================================================
+   Responsive Adjustments
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .card,
+    .card-wide {
+        max-width: 100%;
+    }
+
+    main {
+        padding: 16px 12px 72px;
+    }
+
+    .admin-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 1024px) {
+    main {
+        align-items: center;
+    }
+}

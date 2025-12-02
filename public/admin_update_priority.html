@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Priority</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="admin-body">
+<header class="app-header">
+    <h1 class="app-title">Update Priority</h1>
+</header>
+
+<main class="main">
+    <div class="card">
+
+        <!-- Search patient by ID -->
+        <div class="form-group">
+            <label for="searchId">Search patient by ID</label>
+
+            <!-- Search box + icon on the RIGHT -->
+            <div class="search-group">
+                <input id="searchId"
+                       type="search"
+                       placeholder="Enter patient ID">
+
+                <!-- Clickable search icon button -->
+                <button type="button"
+                        class="search-button"
+                        onclick="handleSearch()"
+                        aria-label="Search">
+                    &#128269;
+                </button>
+            </div>
+
+            <!-- Search result message -->
+            <p id="searchMessage" class="form-hint"></p>
+        </div>
+
+        <!-- Grey area: empty before search, shows info only after a valid search -->
+        <div id="statusContainer" class="status-block empty">
+            <div class="status-row">
+                <strong>Patient Name:</strong>
+                <span id="statusPatientName">John Doe</span>
+            </div>
+            <div class="status-row">
+                <strong>Current Triage Level:</strong>
+                <span id="statusCurrentLevel">Level 2</span>
+            </div>
+        </div>
+
+        <h3>Choose new level</h3>
+
+        <!-- Level selection buttons -->
+        <div class="button-row">
+            <button type="button"
+                    class="btn level-choice level-1"
+                    onclick="selectLevel(1)">
+                Level 1
+            </button>
+
+            <button type="button"
+                    class="btn level-choice level-2"
+                    onclick="selectLevel(2)">
+                Level 2
+            </button>
+
+            <button type="button"
+                    class="btn level-choice level-3"
+                    onclick="selectLevel(3)">
+                Level 3
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label for="reason">Reason</label>
+            <textarea id="reason"
+                      placeholder="Explain why the triage level is changed"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="changedBy">Changed by</label>
+            <input id="changedBy" type="text" placeholder="Staff name">
+        </div>
+
+        <div class="button-row">
+    <a href="admin_home.html" class="btn btn-secondary">Cancel</a>
+
+    <button type="button"
+            class="btn btn-primary"
+            onclick="handleSave()">
+        Save
+    </button>
+
+    <!-- mark patient as completed -->
+    <button type="button"
+            class="btn btn-secondary"
+            onclick="markCompleted()">
+        Mark as Completed
+    </button>
+</div>
+
+
+        <div class="section" style="margin-top:16px;">
+            <a href="#"
+               id="fullInfoLink"
+               title="Please enter a patient ID first."
+               onclick="handleViewInfo(event)">
+                View full patient info
+            </a>
+        </div>
+
+    </div>
+</main>
+
+<script>
+  // Stores the last successfully found patient ID
+  let selectedPatientId = null;
+
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  // Load a single patient by ID and fill the grey box
+  async function loadPatientById(id) {
+    const messageEl = document.getElementById('searchMessage');
+    const statusBox = document.getElementById('statusContainer');
+    const nameSpan = document.getElementById('statusPatientName');
+    const triageSpan = document.getElementById('statusCurrentLevel');
+    const infoLink = document.getElementById('fullInfoLink');
+
+    selectedPatientId = null;
+    infoLink.href = "#";
+    infoLink.title = "Please enter a valid patient ID first.";
+
+    if (!id) {
+      statusBox.classList.add('empty');
+      messageEl.textContent = "Please enter a patient ID.";
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/patients/${id}`);
+      if (!res.ok) {
+        statusBox.classList.add('empty');
+        messageEl.textContent = "No patient found. Please try another ID.";
+        return;
+      }
+
+      const p = await res.json();
+
+      messageEl.textContent = "";
+      nameSpan.textContent = p.name;
+      triageSpan.textContent = `Level ${p.triage_level_code}`;
+
+      statusBox.classList.remove('empty');
+      selectedPatientId = p.id;
+
+      infoLink.href = "admin_patient_info.html?id=" + encodeURIComponent(p.id);
+      infoLink.title = "View full info for patient " + p.id + ".";
+    } catch (e) {
+      console.error(e);
+      statusBox.classList.add('empty');
+      messageEl.textContent = "Error loading patient. Please try again.";
+    }
+  }
+
+  // On page load: if URL has ?id=..., auto-load that patient
+  document.addEventListener('DOMContentLoaded', () => {
+    const initialId = getQueryParam('id');
+    if (initialId) {
+      const input = document.getElementById('searchId');
+      input.value = initialId;
+      loadPatientById(initialId);
+    }
+  });
+
+  // Search button handler
+  function handleSearch() {
+    const idInput = document.getElementById('searchId');
+    const id = idInput.value.trim();
+    loadPatientById(id);
+  }
+
+  // Level selection function
+  function selectLevel(level) {
+    const buttons = document.querySelectorAll('.level-choice');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    const selected = document.querySelector(".level-choice.level-" + level);
+    if (selected) {
+      selected.classList.add('active');
+    }
+  }
+
+  // Guard for "View full patient info" link
+  function handleViewInfo(event) {
+    if (!selectedPatientId) {
+      event.preventDefault();
+      alert("Please search for a valid patient ID first.");
+    }
+  }
+
+  // Save: update triage level in DB
+  async function handleSave() {
+    if (!selectedPatientId) {
+      alert("Please search for a valid patient ID before saving.");
+      return;
+    }
+
+    const activeLevelBtn = document.querySelector(".level-choice.active");
+    if (!activeLevelBtn) {
+      alert("Please choose a new triage level before saving.");
+      return;
+    }
+
+    const levelText = activeLevelBtn.textContent.trim(); // "Level 1"
+    const levelNumber = Number(levelText.replace("Level", "").trim());
+
+    if (!levelNumber || isNaN(levelNumber)) {
+      alert("Invalid triage level selected.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/patients/${selectedPatientId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ triage_level_code: levelNumber })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert("Error saving changes: " + (err.error || res.statusText));
+        return;
+      }
+
+      alert("Changes saved for patient " + selectedPatientId + ".");
+      window.location.href = "admin_home.html";
+    } catch (e) {
+      console.error(e);
+      alert("Network error while saving changes.");
+    }
+  }
+
+  // NEW: Mark patient as completed (seen / discharged)
+  async function markCompleted() {
+    if (!selectedPatientId) {
+      alert("Please search for a valid patient first.");
+      return;
+    }
+
+    const confirmDone = confirm(
+      "Mark patient " + selectedPatientId + " as completed? " +
+      "They will be removed from the waiting queue."
+    );
+    if (!confirmDone) return;
+
+    try {
+      const res = await fetch(`/api/patients/${selectedPatientId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "completed" })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert("Error marking completed: " + (err.error || res.statusText));
+        return;
+      }
+
+      alert("Patient " + selectedPatientId + " marked as completed.");
+      window.location.href = "admin_home.html";
+    } catch (e) {
+      console.error(e);
+      alert("Network error while marking completed.");
+    }
+  }
+</script>
+
+
+</body>
+</html>
