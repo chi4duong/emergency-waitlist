@@ -40,7 +40,7 @@ async function getQueueWithWaitTimes() {
 }
 
 
-// ---------- Test DB route (keep this, handy for debugging) ----------
+// ---------- Test DB route (handy for debugging) ----------
 app.get("/api/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
